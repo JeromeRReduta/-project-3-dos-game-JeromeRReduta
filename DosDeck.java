@@ -1,11 +1,12 @@
 import java.util.*;
-public class DosDeck extends CardStack {
+public class DosDeck extends CardStack implements CardHolder {
 
     /* Create: 3 each 1, 3, 4, 5, for every color
         2 each 6-10 for every color
         2 wild cards for # for every suit
         12 wild cards for every color
      */
+
     public DosDeck() {
         super();
     }
@@ -44,8 +45,15 @@ public class DosDeck extends CardStack {
         }
     }
 
-
-
+    public String toString()
+    {
+        String result = "";
+        for(int i=0; i<super.getSize(); i++)
+        {
+            result+="[" +  (i+1) + ": "+super.getCard(i).toString()+"] ";
+        }
+        return result;
+    }
 }
 
 

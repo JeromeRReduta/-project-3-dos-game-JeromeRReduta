@@ -34,6 +34,10 @@ public class Card
         return face;
     }
 
+    public void setFace(int update) {
+        face = update;
+    }
+
     //-----------------------------------------------------------------
     //  Returns the suit (numeric value) of this card.
     //-----------------------------------------------------------------
@@ -51,6 +55,10 @@ public class Card
 
     public void setSuitName(String update) {
         suitName = update;
+    }
+
+    public void setSuit(int update) {
+        suit = update;
     }
     public String toString()
     {

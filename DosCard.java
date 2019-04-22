@@ -8,11 +8,6 @@ public class DosCard extends Card {
 
     public void setSuitName(int suitValue) {
         switch(suitValue) {
-
-            case 5:
-                super.setSuitName("ANY");
-                break;
-
             case 1:
                 super.setSuitName("BLUE");
                 break;
@@ -27,6 +22,10 @@ public class DosCard extends Card {
 
             case 4:
                 super.setSuitName("YELLOW");
+                break;
+
+            case 5:
+                super.setSuitName("ANY");
                 break;
         }
 

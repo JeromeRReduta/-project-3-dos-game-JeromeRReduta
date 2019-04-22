@@ -1,34 +1,30 @@
 public class DosPlayer extends Player {
 
-    DosHand hand = new DosHand();
+    private DosHand hand = new DosHand();
 
     public DosPlayer(String name) {
         super(name);
     }
 
-    public void getMatches(CardStack centerRow) {
+    public void getMatches(CenterRow cRow) {
 
         String singleMatches = "SINGLE NUMBER MATCHES:\n========================\n";
         String doubleMatches = "DOUBLE NUMBER MATCHES:\n========================\n";
 
-        for (int index = 0; index < centerRow.getSize(); index ++) {
-            singleMatches += hand.getSingleNumberMatches(centerRow.getCard(index));
-            doubleMatches += hand.getDoubleNumberMatches(centerRow.getCard(index));
+        for (int index = 0; index < cRow.getSize(); index ++) {
+            singleMatches += hand.getSingleNumberMatches(cRow.getCard(index, 0));
+            doubleMatches += hand.getDoubleNumberMatches(cRow.getCard(index, 0));
 
         }
 
         System.out.println(singleMatches + "\n\n\n" + doubleMatches);
     }
 
-    public CardStack getHand() {
+    public DosDeck getHand() {
         return hand;
     }
 
-    public void moveCard(Card c, CardStack newLocation) {
-        hand.moveCard(c, newLocation);
-    }
-
     public String displayInfo() {
-        return super.getName() + "\n" + "HAND: \n" + hand;
+        return super.getName() + "'s TURN:\n\n" + "HAND: \n" + hand + "\n";
     }
 }

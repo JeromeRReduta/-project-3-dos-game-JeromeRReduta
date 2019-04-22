@@ -1,38 +1,48 @@
 import java.util.*;
 
-public class CenterRow {
+public class CenterRow implements CardHolder{
     ArrayList<DosDeck> centerRow = new ArrayList<DosDeck>();
 
-    public CenterRow() {
+    public CenterRow(DosDeck deck) {
+        addCard(deck);
+        addCard(deck);
+    }
+
+    public int getSize() {
+        return centerRow.size();
+    }
+
+    public Card getCard(int row, int index) {
+        return centerRow.get(row).getCard(index);
     }
 
     public void addCard(DosDeck draw) {
         DosDeck newCards = new DosDeck();
 
-        draw.moveCard(draw.getCard(0), newCards);
+        CardHolder.moveCards(draw, newCards, 1);
         centerRow.add(newCards);
     }
 
     public void matchCards(int stackNum, int limit, DosDeck draw, Card[] cards) {
         for (int index = 0; index < limit; index++ ) {
-            draw.moveCard(cards[index], centerRow.get(stackNum));
+            CardHolder.moveCards(draw, centerRow.get(index), 1);
         }
     }
 
 
 
-    public void moveStack(int index, CardStack newLocation) {
+    public void moveStack(int index, CardStack dest) {
         DosDeck stack = centerRow.get(index);
 
         while (stack.hasMoreCards()) {
-            stack.moveCard(stack.getCard(0), newLocation);
+            CardHolder.moveCards(stack, dest, 1);
         }
     }
 
-    public void refresh(CardStack draw, CardStack newLocation) {
+    public void refresh(DosDeck draw, CardStack newLocation) {
         int index = 0;
         while (index < centerRow.size()) {
-            if (centerRow.get(index).getSize() > 1) {
+            if (centerRow.get(index).getSize() == 0) {
                 moveStack(index, newLocation);
                 centerRow.remove(index);
             }
@@ -44,9 +54,33 @@ public class CenterRow {
 
         while (centerRow.size() < 2) {
             DosDeck cards = new DosDeck();
-            draw.moveCard(draw.getCard(0), cards);
+            CardHolder.moveCards(draw, cards, 1);
             centerRow.add(cards);
         }
+
+    }
+
+    public boolean getColorMatch(Player p, int rowNum, Card[] cards) {
+        String cardColor = getCard(rowNum, 0).getSuitName();
+        String matchColor;
+
+
+
+        for (int index = 0; index < cards.length; index++) {
+            matchColor = cards[index].getSuitName();
+
+            if (!cardColor.equals(matchColor) || !matchColor.equals("ANY")) {
+                System.out.println("Colors don't match!");
+                return false;
+            }
+
+        }
+
+        System.out.println("All colors match!");
+
+        p.setPoints(cards.length);
+
+        return true;
 
     }
 
@@ -54,7 +88,15 @@ public class CenterRow {
         String message = "Center Row:\t";
 
         for (int index = 0; index < centerRow.size(); index++) {
-            message += "[" + centerRow.get(index).getCard(0) + "]";
+
+            if (centerRow.get(index).getSize() == 0) {
+                message += "[matched]";
+            }
+
+            else {
+                message += "[" + centerRow.get(index).getCard(0) + "]";
+            }
+
         }
         return message;
     }
@@ -65,6 +107,8 @@ public class CenterRow {
         for (int index = 0; index < centerRow.size(); index++) {
 
             message += "STACK " + (index + 1) + ":\t";
+
+
             message += centerRow.get(index) + "\n";
             }
         return message;

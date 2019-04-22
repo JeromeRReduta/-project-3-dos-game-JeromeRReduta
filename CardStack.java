@@ -99,11 +99,6 @@ public class CardStack
         stack.set(position2, temp);
     }
 
-    public void moveCard(Card c, CardStack newLocation) {
-        removeCard(c);
-        newLocation.addCard(c);
-    }
-
     //-----------------------------------------------------------------
     //  String representation of the Stack of Cards
     //-----------------------------------------------------------------

@@ -1,6 +1,6 @@
 import java.util.*;
 public class DosPlayerDriver {
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
 
         Random rng = new Random();
 
@@ -36,5 +36,5 @@ int i = 0;
         a.getMatches(centerRow);
 
 
-    }
+    } */
 }

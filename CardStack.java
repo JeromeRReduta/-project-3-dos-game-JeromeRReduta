@@ -90,12 +90,18 @@ public class CardStack
     //-----------------------------------------------------------------
     //  Swaps two cards in the Stack of Cards
     //-----------------------------------------------------------------
+
     public void swap(int position1, int position2)
     {
-        Card temp;  
+        Card temp;
         temp = stack.get(position1);
         stack.set(position1, stack.get(position2));
         stack.set(position2, temp);
+    }
+
+    public void moveCard(Card c, CardStack newLocation) {
+        removeCard(c);
+        newLocation.addCard(c);
     }
 
     //-----------------------------------------------------------------

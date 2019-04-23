@@ -1,162 +1,322 @@
+// DosGame.java.
+
+/* To do:
+    Set-up:
+            Deck:
+                Create full deck
+                Display cards
+                Shuffle cards
+                Display cards
+            Players:
+
+                Ask players for names
+                Instantiate 1 player/name
+                Deal each player 7 cards, alternating
+                Display each player's info
+
+            Center Row:
+                Deal 2 cards to center row (note: put in instantiation)
+                Display 2 cards from Center Row
+            Discard Pile:
+                Instantiate empty discard pile
+
+    Game:
+        Display center row
+        Display single and double # matches
+        If there is > 1 match, MUST play at least 1 of matches
+        If no match, must draw a card
+            Card randomly chosen to be moved from hand to Center Row
+
+    End turn:
+
+        Show player's bonus pts
+        Refresh Center Row
+        Display Center Row
+        If player has bonus points, randomly put cards from hand to Center Row
+        Display Center Row
+        Go to Next player
+
+    Check for end:
+        Decide winner if:
+            - player has 0 cards in hand - returns player's index
+            - player has >= 5 pts in runningTotal - returns player's index
+            - deck has 0 cards (in this case, player w/
+                    least cards wins) - returns -1
+
+    Avengers - End game:
+        Gets input from checkForEnd()
+
+        if (input > 0) {
+            player w/ that index printed as winner
+         }
+
+         if (input == -1) {
+             get Measurable class from Canvas
+             print player w/ MINIMUM cards in hand as winner
+
+             if (>1 person w/ minimum cards)
+              {it's tie among those people
+              }
+
+            }
+
+
+
+
+
+ */
+
 import java.util.*;
 
 public class DosGame {
 
-    public static DosDeck makeDosDeck(Random rng) {
+    // Creates filled, shuffled DosDeck
+    public static DosDeck setUpDeck() {
         DosDeck deck = new DosDeck();
         deck.fillDeck();
-        deck.shuffle(rng);
+
+        System.out.println(deck);
+        deck.shuffle();
+        System.out.println(deck);
 
         return deck;
     }
 
-    public static ArrayList<DosPlayer> makeDosPlayers(Random rng, Scanner scan) {
-        ArrayList<DosPlayer> players = new ArrayList<DosPlayer>();
+    // Creates array of players - 1 player/name
+    public static DosPlayer[] setUpPlayers(Scanner scan, DosDeck deck) {
 
-        System.out.print("Enter player 1 name: ");
+        // Asks for # of players, makes array for that many players
+        System.out.println("How many players?");
+        // Thanks to https://stackoverflow.com/questions/8232980/java-for-loop-skips-runs-twice
+        // For loop was running twice - this taught me how to fix that
 
-        String answer = scan.nextLine();
+        DosPlayer[] players = new DosPlayer[scan.nextInt()];
 
-        for (int index = 2; !answer.toUpperCase().equals("PUMPERNICKEL"); index++) {
-            players.add(new DosPlayer(answer));
-            System.out.println("Enter player " + index + " name or type 'PUMPERNICKEL' to begin game:");
+        // scan.nextLine() after scan.nextInt() is essential
+        scan.nextLine();
 
-            answer = scan.nextLine();
+        // Creates players w/ input name
+        for (int index = 0; index < players.length; index++) {
+            System.out.println("Enter name: ");
+            players[index] = new DosPlayer(scan.nextLine());
+        }
+
+        // Deals 7 cards, alternating, per player
+        for (int index = 0; index < 7; index++) {
+            for (int i = 0; i < players.length; i++) {
+                CardHolder.moveCard(deck, players[i].getHand());
+            }
+        }
+
+        // Displays info of all players
+        for (int index = 0; index < players.length; index++) {
+            System.out.println(players[index].displayInfo());
         }
 
         return players;
-
     }
 
-    public static void deal(ArrayList<DosPlayer> players, DosDeck deck) {
-        for (int repeat = 0; repeat < 7; repeat++) {
-            for (int index = 0; index < players.size(); index++) {
-                CardHolder.moveCards(deck, players.get(index).getHand(), 1);
-            }
-        }
+    // Creates CenterRow and displays info
+    public static CenterRow setUpCenterRow(DosDeck deck) {
+        CenterRow cRow = new CenterRow(deck);
+        System.out.println(cRow.display());
+
+        return cRow;
     }
 
-
-    public static int pickOption(DosPlayer p, DosDeck deck, CenterRow cRow, Scanner scan) {
+    // Player p plays 1 turn
+    public static void playTurn(Scanner scan, DosPlayer p, DosDeck deck, CenterRow cRow, CardStack discard) {
+        // Displays p  and centerRow info
         System.out.println(p.displayInfo());
         System.out.println(cRow.display());
-        p.getMatches(cRow);
 
-        String input = "";
+        DosHand hand = p.getHand();
 
-        while (!input.equals("1") && !input.equals("2") && !input.equals("3") && !input.equals("4")) {
+        // Displays p's matching cards w/ cards in centerRow
+        hand.displayMatches(cRow);
+
+        ArrayList<Card[]> options = hand.getMatches(cRow);
+        ArrayList<Integer> stackNums = hand.getStackNums(cRow);
+
+        // Case: p has matching cards - p MUST pick one match
+        if (options.size() > 0) {
+            System.out.println("Choose a match");
+            int choice = scan.nextInt();
+            String repeat = "";
+            scan.nextLine();
+
+            // Checks if inputted card(s) color match
+            cRow.getColorMatch(p, stackNums.get(choice-1), options.get(choice-1));
+
+            // Matches cards w/ stack
+            cRow.matchCards(stackNums.get(choice-1), hand, options.get(choice-1));
+
+            // Whole stack moved to discard pile (stack can
+            // ...only be matched w/ once/turn
+            cRow.moveStack(stackNums.get(choice-1), discard);
+
+            // Case: Matched card, and have more options left
+            // Matching another card is optional, however
+            // ...will draw a card if you have no matches left
+            // ...so pay attention!
+            if (options.size() > 0) {
+
+                System.out.println("Match another card? [0] No [1] Yes");
+
+                repeat = scan.nextLine();
+
+            }
+
+            if (repeat.equals("1")) {
+                playTurn(scan, p, deck, cRow, discard);
+            }
 
 
-            System.out.println("Choose: \n" +
-                    "1: Single Number Match\n" +
-                    "2: Double Number Match\n" +
-                    "3: Draw Card\n")
-
-            input = scan.nextLine();
         }
 
-        return Integer.parseInt(input);
+        // Case: No matches - draw card, random card from
+        // ...hand added to centerRow
+        else {
+            CardHolder.moveCard(deck, hand);
+
+            int last = hand.getSize()-1;
+
+            System.out.println("Card drawn: " + hand.getCard(last));
+
+            cRow.addRandomCard(hand);
+
+            System.out.println("Random card added from hand to center row\n\n");
+        }
+
+        // Display: p's info, centerRow's info, p's name
+        // ...ending turn
+        System.out.println(p.displayInfo());
+        System.out.println(cRow.display());
+        System.out.println(p.getName() + " ends turn.");
+        System.out.println("======================\n\n");
+
     }
 
-    public static void NumMatch(DosPlayer p, DosDeck deck, CenterRow cRow, DosDeck discardPile, Scanner scan, int cardAmount) {
-        Card choice = new Card(5, 5);
-        int answer = 0;
-        boolean done = false;
-        Card[] match = new DosCard[cardAmount];
-        int total = 0;
+    // Sequence of events after ending turn:
+    // 1) Print how many bonus points p has
+        // - If p gets color match, 1 bonus pt for card
+        // ...that matched color
 
+    // 2) Refresh centerRow - remove empty rows, then add
+    // ...cards to centerRow until row has 2 stacks
 
-        while (total != choice.getFace() && done == false) {
+    // 3) Add # of cards = to bonus pts in centerRow
+    public static void endTurn(DosPlayer p, DosDeck deck, CenterRow cRow, CardStack discard) {
 
-            System.out.println("Pick card in center row to match or enter -1 to go back");
-            System.out.println(answer);
+        // Display pts
+        int pts = p.getPoints();
+        System.out.println(p.getName() + " has " + pts + " bonus points.");
 
+        // Refresh centerRow
+        cRow.refresh(deck, discard);
 
-            answer = scan.nextInt();
-            if (answer >= 1) {
-                choice = cRow.getCard(answer - 1, 0);
+        // Display centerRow
+        System.out.println("Center Row refreshed:\n "
+                + cRow.display());
 
-                System.out.println("Pick card(s) in hand to match with");
-
-                for (int index = 0; index < cardAmount; index++) {
-                    match[index] = p.getHand().getCard(scan.nextInt() - 1);
-                }
-
-
-
-
-                    for (int index = 0; index < cardAmount; index++) {
-                        total += match[index].getFace();
-
-                    }
-
-
-                    if (total == choice.getFace() || total < choice.getFace() && (match[0].getFace() == -1 || match[match.length - 1].getFace() == -1)) {
-                        System.out.println("Cards match #!");
-                        cRow.getColorMatch(p, answer - 1, match);
-                        cRow.matchCards(answer - 1, 1, p.getHand(), match);
-                        cRow.moveStack(answer - 1, discardPile);
-                        done = true;
-
-                    } else {
-                        System.out.println("Cards do not match #s!");
-                    }
-
-                }
-            else {
-                done = true;
+        // Case: p has bonus pts - adds random card from hand
+        // ... to centerRow
+        if (pts > 0) {
+            for (int index = 0; index < pts; index++) {
+                cRow.addRandomCard(p.getHand());
             }
 
-
-
-
-            }
+            System.out.println(pts + " cards randomly added to Center Row from hand");
         }
 
+    }
+    /* Check for end:
+    Decide winner if:
+            - player has 0 cards in hand
+            - player has >= 5 pts in runningTotal
+            - deck has 0 cards (in this case, player w/
+            least cards wins) */
 
+    /* message:
+        0 = keep going
+        # > 0 = player w/ index # wins
+        -1 = deck empty
+     */
+
+    public static int checkForEnd(DosPlayer p, DosDeck deck, int index) {
+
+        // Default case - go to next round
+        int message = 0;
+
+        // Case: p's hand empty - p wins
+        if (p.getHand().getSize() == 0) {
+            System.out.println(p.getName() + " has run out of cards!");
+            message = index;
+        }
+
+        // Case: p has >= total bonus pts - p wins
+        else if (p.getTotalPoints() >= 5) {
+            System.out.println(p.getName() + " has >= 5 bonus points!");
+            message = index;
+        }
+
+        // Case: deck empty - give message that deck is empty
+        else if (!deck.hasMoreCards()) {
+            message = -1;
+        }
+
+        return message;
+    }
+
+    // Gives endgame screen depending on inputted message
+
+    public static void endGame(DosPlayer[] players, int message) {
+
+        // Case: 1 player won
+        if (message > 0) {
+            DosPlayer p = players[message];
+            System.out.println(p.getName() + " wins!");
+
+        }
+
+        // Case: Deck empty (multiple players may win)
+        else {
+            int min = DosPlayer.getMinSize(players);
+            DosPlayer.getWonLost(players, min);
+
+
+        }
+    }
+
+    // Program
     public static void main(String[] args) {
-        Random rng = new Random();
+
+        // Creating objects and var
         Scanner scan = new Scanner(System.in);
+        DosDeck deck = setUpDeck();
+        DosPlayer[] players = setUpPlayers(scan, deck);
+        CenterRow cRow = setUpCenterRow(deck);
+        DosDeck discard = new DosDeck();
 
-        DosDeck deck = makeDosDeck(rng);
-        ArrayList<DosPlayer> players = makeDosPlayers(rng, scan);
-        CenterRow cRow = new CenterRow(deck);
+        // Index of winner
 
-        DosDeck discardPile = new DosDeck();
-
-        deal(players, deck);
-// Note: Make playGame() that plays game and returns playerChar's #
-        // If that p won, return -1 * pChar's #
-        // Then make method that prints out congrats msg for p#
-        // (Will prob take -# and multiply it by -1 to get pChar's #
+        // 0 = no-one yet, # > 0 = player w/ index #
         int winner = 0;
-        int choice = 0;
 
+        // Index of person playing this round
+        int index = 0;
 
-        for (int index = 0; index < players.size(); index++) {
-            choice = pickOption(players.get(index), deck, cRow, scan);
+        // Game:
+        while (winner == 0) {
+            playTurn(scan, players[index], deck, cRow, discard);
+            endTurn(players[index], deck, cRow, discard);
+            System.out.println(checkForEnd(players[index], deck, index));
 
-           if (choice == 3) {
-               drawCard();
-           }
-
-           else {
-               NumMatch(players.get(index), deck, cRow, discardPile, scan, choice);
-
-               System.out.println(cRow.display());
-           }
-
-
+            // Goes from 0 to players.length - 1 and loops back
+            index = (index + 1)%players.length;
         }
 
-        //System.out.println(endMessage(winner));
-
-
-
-
-
-
+        // End of game:
+        endGame(players, index);
     }
-
-
 }

@@ -1,3 +1,5 @@
+// DosDeck.java
+
 import java.util.*;
 public class DosDeck extends CardStack implements CardHolder {
 
@@ -6,12 +8,14 @@ public class DosDeck extends CardStack implements CardHolder {
         2 wild cards for # for every suit
         12 wild cards for every color
      */
+    Random rng = new Random();
 
     public DosDeck() {
         super();
     }
 
-
+    // Adds (repeat) copies of cards w/ faces listed in (list)
+    // ...and suits listed in (colors)
     public void addCards(int repeat, int[] list, int[] colors) {
         for (int suit = 0; suit < colors.length; suit++) {
             for (int loop = 0; loop < repeat; loop++) {
@@ -21,7 +25,7 @@ public class DosDeck extends CardStack implements CardHolder {
             }
         }
     }
-
+    // Made as shortcut to fill deck w/ all 108 cards in 1 method
     public void fillDeck() {
         int[] lowNum = {1, 3, 4, 5};
         int[] highNum = {6, 7, 8, 9, 10, -1};
@@ -35,7 +39,8 @@ public class DosDeck extends CardStack implements CardHolder {
         addCards(12, any2, wild);
     }
 
-    public void shuffle(Random rng)
+    // Shuffles deck
+    public void shuffle()
     {
         int choice = 0;
 
@@ -50,7 +55,7 @@ public class DosDeck extends CardStack implements CardHolder {
         String result = "";
         for(int i=0; i<super.getSize(); i++)
         {
-            result+="[" +  (i+1) + ": "+super.getCard(i).toString()+"] ";
+            result+="[" + super.getCard(i).toString()+"] ";
         }
         return result;
     }

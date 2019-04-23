@@ -5,13 +5,14 @@
 //********************************************************************
 
 // Note: Allowed to modify it to make it more generic (i.e. not
-// ... have suit names) if youw ant
+// ... have suit names) if you want
 import java.util.Random;
 
 public class Card
 {
-    private final static int NUM_FACES = 13;
-    private final static int NUM_SUITS = 4;
+
+    // Edited: Removed final vars and faceName to make class more
+    // ...generic/adaptable for DosCard
 
     protected int face, suit;
     private String suitName;
@@ -53,6 +54,7 @@ public class Card
 
     public String getSuitName() {return suitName;}
 
+
     public void setSuitName(String update) {
         suitName = update;
     }
@@ -60,6 +62,7 @@ public class Card
     public void setSuit(int update) {
         suit = update;
     }
+
     public String toString()
     {
         return face + " of " + suitName;

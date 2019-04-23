@@ -101,7 +101,7 @@ public class Player {
     //-----------------------------------------------------------------
 	public String toString()
 	{
-		String result = "\n"+name+": Running total: "+runningTotal+"\n\t"+
+		String result = "\n"+name+":\nRunning total: "+runningTotal+"\n\t"+
 						"wins: "+wins+"\n\tlosses: "+losses+"\n";
 		return result;
 	}

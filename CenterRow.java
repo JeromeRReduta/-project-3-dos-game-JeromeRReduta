@@ -70,6 +70,10 @@ public class CenterRow implements CardHolder{
             }
         }
 
+        while (centerRow.size() > 2) {
+            centerRow.remove(2);
+        }
+
         while (centerRow.size() < 2) {
             DosDeck cards = new DosDeck();
             CardHolder.moveCard(draw, cards);

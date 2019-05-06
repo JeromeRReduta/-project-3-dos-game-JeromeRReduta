@@ -79,7 +79,7 @@ public class DosPlayer extends Player {
 
     // Displays DosPlayer's name and hand
     public String displayInfo() {
-        return super.getName() + "'s TURN:\n\n" + "HAND: \n" + hand + "\n";
+        return super.getName() + "'s TURN:\n" + "HAND:\t" + hand + "\n";
     }
 
 

@@ -128,7 +128,7 @@ public class DosGame {
     public static void playTurn(Scanner scan, DosPlayer p, DosDeck deck, CenterRow cRow, CardStack discard) {
         // Displays p  and centerRow info
         System.out.println(p.displayInfo());
-        System.out.println(cRow.display());
+        System.out.println(cRow.display() + "\n");
 
         DosHand hand = p.getHand();
 
@@ -139,7 +139,7 @@ public class DosGame {
         ArrayList<Integer> stackNums = hand.getStackNums(cRow);
 
         // Case: p has matching cards - p MUST pick one match
-        if (options.size() > 0) {
+        if (options.size() > 0 && hand.hasMoreCards()) {
             System.out.println("Choose a match");
             int choice = scan.nextInt();
             String repeat = "";
@@ -180,6 +180,9 @@ public class DosGame {
             CardHolder.moveCard(deck, hand);
 
             int last = hand.getSize()-1;
+
+            System.out.println(deck.getSize());
+            System.out.println(hand.getSize());
 
             System.out.println("Card drawn: " + hand.getCard(last));
 
@@ -223,7 +226,9 @@ public class DosGame {
         // ... to centerRow
         if (pts > 0) {
             for (int index = 0; index < pts; index++) {
+                System.out.println(p.getHand().getSize());
                 cRow.addRandomCard(p.getHand());
+                p.setPoints(0);
             }
 
             System.out.println(pts + " cards randomly added to Center Row from hand");
@@ -246,26 +251,27 @@ public class DosGame {
     public static int checkForEnd(DosPlayer p, DosDeck deck, int index) {
 
         // Default case - go to next round
-        int message = 0;
 
         // Case: p's hand empty - p wins
+
+        System.out.println("HAND EMPTY? " + (p.getHand().getSize() == 0));
         if (p.getHand().getSize() == 0) {
             System.out.println(p.getName() + " has run out of cards!");
-            message = index;
+            return index + 1;
         }
 
         // Case: p has >= total bonus pts - p wins
         else if (p.getTotalPoints() >= 5) {
             System.out.println(p.getName() + " has >= 5 bonus points!");
-            message = index;
+            return index;
         }
 
         // Case: deck empty - give message that deck is empty
         else if (!deck.hasMoreCards()) {
-            message = -1;
+            return -1;
         }
 
-        return message;
+return 0;
     }
 
     // Gives endgame screen depending on inputted message
@@ -274,7 +280,7 @@ public class DosGame {
 
         // Case: 1 player won
         if (message > 0) {
-            DosPlayer p = players[message];
+            DosPlayer p = players[message-1];
             System.out.println(p.getName() + " wins!");
 
         }
@@ -310,8 +316,7 @@ public class DosGame {
         while (winner == 0) {
             playTurn(scan, players[index], deck, cRow, discard);
             endTurn(players[index], deck, cRow, discard);
-            System.out.println(checkForEnd(players[index], deck, index));
-
+            winner = checkForEnd(players[index], deck, index);
             // Goes from 0 to players.length - 1 and loops back
             index = (index + 1)%players.length;
         }
